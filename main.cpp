@@ -4,8 +4,14 @@
 
 using namespace std;
 
+#include "lib/containers/Buffer.h"
+
 
 int main() {
-    cout << "Hello, World!" << endl;
+
+
+    geox::Buffer<int> buffer(2);
+
+
     return 0;
 }

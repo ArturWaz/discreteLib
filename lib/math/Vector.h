@@ -17,7 +17,8 @@
 
 namespace geox {
 
-    template<class Type> class Vector {
+    template<class Type>
+    class Vector {
     protected:
 
         Type *table;

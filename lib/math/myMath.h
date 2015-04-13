@@ -11,16 +11,20 @@
 
 
 #include <cmath>
+#include <complex>
 
 
+namespace geox {
 
 
-#define PI double(3.141592653589793238462643383279502884197169)
+    double pi() { return double(3.141592653589793238462643383279502884197169); }
 
 
 // math operations for non-standard types
 
-// sqrt(Type&) is used in Vector norm
+// sqrt(Type&) used in Vector norm
 
+
+}
 
 #endif //__myMath_H_

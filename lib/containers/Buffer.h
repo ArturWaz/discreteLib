@@ -15,7 +15,8 @@
 
 namespace geox {
 
-    template<typename T> class Buffer {
+    template<typename T>
+    class Buffer {
 
         T * /*const*/ array_;
         size_t length_;
@@ -135,7 +136,6 @@ namespace geox {
         };
 
         inline iterator begin() { return iterator(this, &(array_[index_])); }
-
 
     };
 

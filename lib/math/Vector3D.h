@@ -16,13 +16,13 @@
 
 namespace geox {
 
-    template<class Type> class Vector3D : public Vector<Type> {
+    template<class Type>
+    class Vector3D : public Vector<Type> {
     public:
 
         Vector3D() : Vector<Type>(3) { }
 
         ~Vector3D() { }
-
 
     };
 
