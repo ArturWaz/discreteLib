@@ -22,27 +22,24 @@ namespace geox {
         size_t length_;
         size_t index_;
 
-        T * /*const*/ beginPtr_; // todo remove this pointer, array_ is sufficient actually
         T * /*const*/ endPtr_;
 
-        void operator=(Buffer) { }
+        void operator=(Buffer) {}
 
-        Buffer(Buffer &) : beginPtr_(nullptr), endPtr_(nullptr) { }
+        Buffer(Buffer &) : endPtr_(nullptr) {}
 
     public:
 
         class Exception : public std::exception {
             char const *info;
         public:
-            explicit Exception(char const *info) : info(info) { }
-
+            explicit Exception(char const *info) : info(info) {}
             virtual char const *what() const throw() { return info; }
         };
 
-        Buffer(size_t length) : length_(length), index_(0)/*, beginPtr_(&(array_[0])), endPtr_(&(array_[LENGTH-1]))*/ {
+        Buffer(size_t length) : length_(length), index_(0) {
             array_ = new T[length_];
             if (array_ == nullptr) throw Exception("Cannot allocate memory, function: Buffer::Buffer(size_t)");
-            beginPtr_ = array_;
             endPtr_ = &(array_[length_ - 1]);
         }
 
@@ -50,9 +47,8 @@ namespace geox {
             array_ = new T[length_];
             if (array_ == nullptr)
                 throw Exception("Cannot allocate memory, function: Buffer::Buffer(size_t, T const &)");
-            beginPtr_ = array_;
             endPtr_ = &(array_[length_ - 1]);
-            T *ptr = beginPtr_;
+            T *ptr = array_;
             while (ptr != endPtr_) {
                 *ptr = initValue;
                 ++ptr;
@@ -108,9 +104,9 @@ namespace geox {
 
         public:
 
-            iterator() : ptr(nullptr) { }
+            iterator() : ptr(nullptr) {}
 
-            ~iterator() { }
+            ~iterator() {}
 
             inline iterator const &operator=(iterator const &it) {
                 buffer = it.buffer;
@@ -124,12 +120,12 @@ namespace geox {
             inline T &operator*() { return *ptr; }
 
             inline iterator &operator++() {
-                (ptr == buffer->beginPtr_) ? ptr = buffer->endPtr_ : --ptr;
+                (ptr == buffer->array_) ? ptr = buffer->endPtr_ : --ptr;
                 return *this;
             }
 
             inline iterator &operator--() {
-                (ptr == buffer->endPtr_) ? ptr = buffer->beginPtr_ : ++ptr;
+                (ptr == buffer->endPtr_) ? ptr = buffer->array_ : ++ptr;
                 return *this;
             }
 
