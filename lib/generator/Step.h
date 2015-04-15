@@ -22,7 +22,7 @@ namespace geox {
         Step(double const &stepTime, double const &stepValue): stepTime_(stepTime), stepValue_(stepValue) {}
         ~Step() {}
 
-        inline double operator()(double const &actualTime) const { return (actualTime < stepTime_) ? 0.0 : stepValue_; }
+        inline double operator()(double const &actualTime) const { return (actualTime <= stepTime_) ? 0.0 : stepValue_; }
 
     };
 
