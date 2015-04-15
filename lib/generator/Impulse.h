@@ -17,12 +17,12 @@ namespace geox {
 
     public:
 
-        Impulse(): impulseTime_(1.0), impulseTime_(1.0) {}
-        Impulse(double impulseTime): impulseTime_(impulseTime), impulseValue_(1.0) {}
-        Impulse(double impulseTime, double impulseValue): impulseTime_(impulseTime), impulseValue_(impulseValue) {}
+        Impulse(): impulseTime_(0.0), impulseValue_(1.0) {}
+        Impulse(double const &impulseTime): impulseTime_(impulseTime), impulseValue_(1.0) {}
+        Impulse(double const &impulseTime, double const &impulseValue): impulseTime_(impulseTime), impulseValue_(impulseValue) {}
         ~Impulse() {}
 
-        inline double operator()(double actualTime) { return (actualTime == impulseTime_) ? 0.0 : impulseValue_; }
+        inline double operator()(double const &actualTime) const { return (actualTime != impulseTime_) ? 0.0 : impulseValue_; }
 
     };
 

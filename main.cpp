@@ -1,7 +1,7 @@
 #include <iostream>
 
 
-#include "lib/generator/Sinus.h"
+#include "lib/generator/Impulse.h"
 
 
 
@@ -12,10 +12,10 @@ using namespace std;
 int main() {
 
 
-    geox::Sinus sinGen(0.5);
-    double time = 1.5;
+    geox::Impulse impulse;
+    double time = .0;
 
-    cout << sinGen(time);
+    cout << impulse(time);
 
     return 0;
 }
