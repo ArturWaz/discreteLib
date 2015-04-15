@@ -25,7 +25,7 @@ namespace geox {
 
         ~Average() { }
 
-        T filter(T const &actualValue) {
+        T operator()(T const &actualValue) {
             sum -= buffer(buffer.size() - 1);
             buffer.push(actualValue);
             sum += buffer(0);

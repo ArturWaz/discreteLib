@@ -31,7 +31,7 @@ namespace geox {
 
         ~Median() { }
 
-        T filter(T const &actualValue) {
+        T operator()(T const &actualValue) {
             T out = 0.0;
 
             buffer.push(actualValue);
