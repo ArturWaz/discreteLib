@@ -18,6 +18,7 @@ namespace geox {
     public:
 
         Step(): stepTime_(1.0), stepTime_(1.0) {}
+        Step(double stepTime): stepTime_(stepTime), stepValue_(1.0) {}
         Step(double stepTime, double stepValue): stepTime_(stepTime), stepValue_(stepValue) {}
         ~Step() {}
 
