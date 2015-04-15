@@ -17,7 +17,7 @@ namespace geox {
 
     public:
 
-        Step(): stepTime_(1.0), stepTime_(1.0) {}
+        Step(): stepTime_(1.0), stepValue_(1.0) {}
         Step(double const &stepTime): stepTime_(stepTime), stepValue_(1.0) {}
         Step(double const &stepTime, double const &stepValue): stepTime_(stepTime), stepValue_(stepValue) {}
         ~Step() {}
