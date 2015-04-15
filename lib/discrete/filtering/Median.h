@@ -8,6 +8,8 @@
 
 
 
+#include "Buffer.h"
+
 
 namespace geox {
 

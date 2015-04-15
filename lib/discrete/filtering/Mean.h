@@ -7,6 +7,9 @@
 
 
 
+#include "Buffer.h"
+
+
 namespace geox {
 
     template<class T, unsigned int ORDER>
