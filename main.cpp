@@ -11,13 +11,13 @@
 using namespace std;
 
 void testFunc1() {
-    double nom[] = {13*1,13*-0.88}; // http://www.eng.ox.ac.uk/~conmrc/dcs/dcs-lec4.pdf
-    double den[] = {1,0.5};
-    geox::TransferFunction tf(nom,1,den,2);
+    double nom[] = {0.2642,0.1353}; // http://www.eng.ox.ac.uk/~conmrc/dcs/dcs-lec4.pdf
+    double den[] = {1,-0.7358,0.1353};
+    geox::TransferFunction tf(nom,2,den,3);
 
     geox::Step gen(0,1);
 
-    for (int time = 0; time < 100; ++time) {
+    for (int time = 0; time < 20; ++time) {
         cout << "in: " << gen(time) << ", out: " << tf(gen(time)) << endl;
     }
 }

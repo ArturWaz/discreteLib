@@ -49,12 +49,13 @@ namespace geox {
         double operator()(double const &actualValue) {
             double outValue = 0.0;
 
+            input_.push(actualValue);
+
             for (size_t i = 0; i < nominatorOrder_; ++i)
                 outValue += nominator_[i] * input_(i);
             for (int i = 0; i < denominatorOrder_; ++i)
                 outValue -= denominator_[i] * output_(i);
 
-            input_.push(actualValue);
             output_.push(outValue);
 
             return outValue;
