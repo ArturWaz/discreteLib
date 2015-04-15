@@ -53,6 +53,8 @@ namespace geox {
                 *ptr = initValue;
                 ++ptr;
             }
+            *ptr = initValue;
+//            for (int i = 0; i < length_; ++i) array_[i] = initValue;
         }
 
         ~Buffer() { delete[]array_; }
