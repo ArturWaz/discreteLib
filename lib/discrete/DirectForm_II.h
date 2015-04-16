@@ -20,6 +20,18 @@ namespace geox {
 
         geox::Buffer<double> history_;
 
+        void init(double *nominator, size_t nominatorOrder, double *denominator, size_t denominatorOrder) {
+            nominator_ = (double*) std::calloc(history_.length()+1, sizeof(double));
+            denominator_ = (double*) std::calloc(history_.length()+1, sizeof(double));
+            if (nominator == nullptr || denominator == nullptr) throw Exception("Cannot allocate memory, function: TransferFunction::TransferFunction(double*, size_t, double*, size_t)");
+            std::memcpy(&(nominator_[nominatorOrder < denominatorOrder ? denominatorOrder-nominatorOrder : 0]),nominator,nominatorOrder*sizeof(double));
+            std::memcpy(&(denominator_[denominatorOrder < nominatorOrder ? nominatorOrder-denominatorOrder : 0]),denominator,denominatorOrder*sizeof(double));
+            for (size_t i = 0; i < history_.length() + 1; ++i) {
+                nominator_[i] /= denominator[0];
+                denominator_[i] /= denominator[0];
+            }
+        }
+
     public:
 
         class Exception : public std::exception {
@@ -31,30 +43,24 @@ namespace geox {
 
         DirectForm_II(double *nominator, size_t nominatorOrder, double *denominator, size_t denominatorOrder):
                 history_((denominatorOrder-1 < nominatorOrder) ? nominatorOrder : denominatorOrder-1,0.0) {
-            nominator_ = (double*) std::calloc(history_.length(), sizeof(double));
-            denominator_ = (double*) std::calloc(history_.length(), sizeof(double));
-            if (nominator == nullptr || denominator == nullptr) throw Exception("Cannot allocate memory, function: TransferFunction::TransferFunction(double*, size_t, double*, size_t)");
-            for (size_t i = 0; i < nominatorOrder; ++i) nominator_[i] = nominator[i]/denominator[0];
-            for (size_t i = 0; i < denominatorOrder-1; ++i) denominator_[i] = denominator[i+1]/denominator[0];
+            init(nominator, nominatorOrder, denominator, denominatorOrder);
         }
         ~DirectForm_II() {
             if (nominator_ != nullptr) free(nominator_);
             if (denominator_ != nullptr) free(denominator_);
         }
 
-        double operator()(double const &actualValue) {
-            double outValue = actualValue;
+        double operator()(double actualValue) {
+            double n = 0.0;
 
-            for (int i = 0; i < history_.length(); ++i) outValue -= denominator_[i] * history_(i);
+            for (size_t i = 1, j = 0; i < history_.length()+1; ++i, ++j) {
+                actualValue -= denominator_[i] * history_(j);
+                n += nominator_[i] * history_(j);
+            }
 
-            double tmp = outValue;
+            history_.push(actualValue);
 
-            outValue *= nominator_[0];
-            for (int i = 0; i < history_.length(); ++i) outValue += nominator_[i+1] * history_(i);
-
-            history_.push(tmp);
-
-            return outValue;
+            return actualValue * nominator_[0] + n;
         }
 
     };
