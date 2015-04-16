@@ -53,7 +53,7 @@ namespace geox {
         double operator()(double actualValue) {
             double n = 0.0;
 
-            for (size_t i = 1, j = 0; i < history_.length()+1; ++i, ++j) {
+            for (size_t i = 1, j = 0; j < history_.length(); ++i, ++j) {
                 actualValue -= denominator_[i] * history_(j);
                 n += nominator_[i] * history_(j);
             }
