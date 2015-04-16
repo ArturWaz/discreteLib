@@ -13,7 +13,7 @@
 
 namespace geox {
 
-    class TransferFunction { // ZOH (zero-order hold)
+    class TransferFunction { // ZOH (zero-order hold) ?
 
         double *nominator_;
         double *denominator_;
@@ -34,12 +34,16 @@ namespace geox {
         };
 
         TransferFunction(double *nominator, size_t nominatorOrder, double *denominator, size_t denominatorOrder):
-                nominatorOrder_(nominatorOrder), denominatorOrder_(denominatorOrder), input_(nominatorOrder,0.0), output_(denominatorOrder,0.0) {
+                nominatorOrder_(nominatorOrder), denominatorOrder_(denominatorOrder), input_(nominatorOrder,0.0), output_(denominatorOrder-1,0.0) {
             nominator_ = (double*)std::malloc(nominatorOrder*sizeof(double));
-            denominator_ = (double*)std::malloc(denominatorOrder*sizeof(double));
-            if (nominator == nullptr ||denominator == nullptr) throw Exception("Cannot allocate memory, function: TransferFunction::TransferFunction(double*, size_t, double*, size_t)");
-            std::memcpy(nominator_, nominator, nominatorOrder * sizeof(double));
-            std::memcpy(denominator_, denominator, denominatorOrder * sizeof(double));
+            denominator_ = (double*)std::malloc((denominatorOrder-1)*sizeof(double));
+            if (nominator == nullptr || denominator == nullptr) throw Exception("Cannot allocate memory, function: TransferFunction::TransferFunction(double*, size_t, double*, size_t)");
+//            std::memcpy(nominator_, nominator, nominatorOrder * sizeof(double));
+//            std::memcpy(denominator_, &(denominator[1]), denominatorOrder-1 * sizeof(double));
+            for (int i = 0; i < nominatorOrder; ++i)
+                nominator_[i] = nominator[i]/denominator[0];
+            for (int i = 0; i < denominatorOrder-1; ++i)
+                denominator_[i] = denominator[i+1]/denominator[0];
         }
         ~TransferFunction() {
             if (nominator_ != nullptr) free(nominator_);
@@ -49,13 +53,13 @@ namespace geox {
         double operator()(double const &actualValue) {
             double outValue = 0.0;
 
-            input_.push(actualValue);
 
             for (size_t i = 0; i < nominatorOrder_; ++i)
                 outValue += nominator_[i] * input_(i);
-            for (int i = 0; i < denominatorOrder_; ++i)
+            for (int i = 0; i < denominatorOrder_-1; ++i)
                 outValue -= denominator_[i] * output_(i);
 
+            input_.push(actualValue);
             output_.push(outValue);
 
             return outValue;

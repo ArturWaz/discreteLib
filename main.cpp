@@ -15,7 +15,7 @@ void testFunc1() {
     double den[] = {1,-0.7358,0.1353};
     geox::TransferFunction tf(nom,2,den,3);
 
-    geox::Step gen(0,1);
+    geox::Step gen;
 
     for (int time = 0; time < 20; ++time) {
         cout << "in: " << gen(time) << ", out: " << tf(gen(time)) << endl;
