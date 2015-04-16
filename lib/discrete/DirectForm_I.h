@@ -13,7 +13,7 @@
 
 namespace geox {
 
-    class DirectForm_I {
+    class DirectForm_I { // todo could be bugged, use carefully
 
         double *nominator_;
         double *denominator_;
