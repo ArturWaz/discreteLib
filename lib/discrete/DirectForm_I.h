@@ -2,8 +2,8 @@
 // Created by artur on 15/04/15.
 //
 
-#ifndef DISCRETELIB_TRANSFERFUNCTION_H
-#define DISCRETELIB_TRANSFERFUNCTION_H
+#ifndef DISCRETELIB_DIRECTFORM_I_H
+#define DISCRETELIB_DIRECTFORM_I_H
 
 
 #include <cstdlib>
@@ -23,6 +23,8 @@ namespace geox {
 
         geox::Buffer<double> input_;
         geox::Buffer<double> output_;
+
+        double actualValue_;
 
     public:
 
@@ -47,18 +49,20 @@ namespace geox {
         }
 
         double operator()(double const &actualValue) {
-            double outValue = 0.0;
+            actualValue_ = 0.0;
 
             for (size_t i = 0; i < nominatorOrder_; ++i)
-                outValue += nominator_[i] * input_(i);
+                actualValue_ += nominator_[i] * input_(i);
             for (size_t i = 0; i < denominatorOrder_-1; ++i)
-                outValue -= denominator_[i] * output_(i);
+                actualValue_ -= denominator_[i] * output_(i);
 
             input_.push(actualValue);
-            output_.push(outValue);
+            output_.push(actualValue_);
 
-            return outValue;
+            return actualValue_;
         }
+
+        inline double actualValue() const { return actualValue_; }
 
     };
 

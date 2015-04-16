@@ -20,6 +20,8 @@ namespace geox {
 
         geox::Buffer<double> history_;
 
+        double actualValue_;
+
         void init(double *nominator, size_t nominatorOrder, double *denominator, size_t denominatorOrder) {
             nominator_ = (double*) std::calloc(history_.length()+1, sizeof(double));
             denominator_ = (double*) std::calloc(history_.length()+1, sizeof(double));
@@ -50,18 +52,22 @@ namespace geox {
             if (denominator_ != nullptr) free(denominator_);
         }
 
-        double operator()(double actualValue) {
-            double n = 0.0;
+        double const &operator()(double actualValue) {
+            actualValue_ = 0.0;
 
             for (size_t i = 1, j = 0; j < history_.length(); ++i, ++j) {
                 actualValue -= denominator_[i] * history_(j);
-                n += nominator_[i] * history_(j);
+                actualValue_ += nominator_[i] * history_(j);
             }
 
             history_.push(actualValue);
 
-            return actualValue * nominator_[0] + n;
+            actualValue_ = actualValue * nominator_[0] + actualValue_;
+
+            return actualValue_;
         }
+
+        inline double actualValue() const { return actualValue_; }
 
     };
 
