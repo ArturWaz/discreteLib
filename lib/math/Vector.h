@@ -11,143 +11,124 @@
 
 #include <cstring>
 #include <cstdlib>
+#include "Matrix.h"
 #include "myMath.h"
-
 
 
 namespace geox {
 
-    template<class Type>
-    class Vector {
-    protected:
-
-        Type *table;
-        size_t length;
-        bool isVertical; // vector orientation, needed in matrix multiplications
-
-        Vector() : isVertical(true) { }
-
-    public:
+    template<class T>
+    class Vector: public Matrix<T> {
+        static_assert(std::is_arithmetic<T>::value, "\nVector<T> template is not supported.\n");
 
         class Exception : public std::exception {
             char const *info;
         public:
             explicit Exception(char const *info) : info(info) { }
-
             virtual char const *what() const throw() { return info; }
         };
 
-        Vector(size_t length) : length(length), isVertical(true) {
-            table = (Type *) calloc(length, sizeof(Type));
-            if (table == NULL) throw Exception("Cannot allocate memory, function Vector::Vector(size_t)");
-        }
+    public:
 
-        Vector(const Vector<Type> &v) : length(v.length), isVertical(v.isVertical) {
-            table = (Type *) malloc(length * sizeof(Type));
-            if (table == NULL) throw Exception("Cannot allocate memory, function Vector::Vector(Vector const &)");
-            memcpy(table, v.table, length * sizeof(Type));
-        }
-
-        Vector<Type> const &operator=(const Vector<Type> &v) {
-            if (length != v.length || isVertical != v.isVertical)
+        inline Vector(size_t length): Matrix<T>(1,length) { }
+        inline Vector(const Vector<T> &v) : Matrix<T>(v) { }
+        Vector<T> const &operator=(const Vector<T> &v) {
+            if (Matrix<T>::getColumns() != Matrix<T>::v.getColumns() || Matrix<T>::getRows() != Matrix<T>::v.getRows())
                 throw Exception("Size of vectors are different, function Vector::operator=(Vector const &)");
-            memcpy(table, v.table, length * sizeof(Type));
+            memcpy(Matrix<T>::elementsPtr(), v.Matrix<T>::elementsPtr(), Matrix<T>::size() * sizeof(T));
+            return *this;
+        }
+        ~Vector() { }
+
+        inline size_t getLength() const { return Matrix<T>::size(); }
+
+        inline Vector<T> &transpose() {
+            size_t tmp = Matrix<T>::rows();
+            Matrix<T>::rows() = Matrix<T>::columns();
+            Matrix<T>::columns() = tmp;
             return *this;
         }
 
-        ~Vector() { free(table); }
-
-        inline Type *tablePtr() const { return table; }
-
-        inline size_t getLength() const { return length; }
-
-        inline size_t getRows() const { return isVertical ? length : 1; }
-
-        inline size_t getColumns() const { return isVertical ? 1 : length; }
-
-        inline Vector<Type> const &transpose() {
-            isVertical = !isVertical;
-            return *this;
-        }
-
-        Type norm() const {
-            Type norm(0);
-            for (int i = 0; i < length; ++i) norm += table[i] * table[i];
+        T norm() const {
+            T norm(0);
+            for (int i = 0; i < Matrix<T>::size(); ++i) norm += (Matrix<T>::elementsPtr())(i) * (Matrix<T>::elementsPtr())(i);
             return sqrt(norm);
         }
 
-        inline Type const &operator[](size_t i) const {
-            if (i >= length) throw Exception("Out of range error, function: Vector::operator[](size_t)");
-            return table[i];
+        T dotProduct(Vector<T> const &v) const {
+            T result(0);
+            for (int i = 0; i < Matrix<T>::size(); ++i) result += (Matrix<T>::elementsPtr())(i) * v(i);
+            return result;
         }
 
-        inline Type &operator[](size_t i) {
-            if (i >= length) throw Exception("Out of range error, function: Vector::operator[](size_t)");
-            return table[i];
-        }
 
-        inline Type const &operator()(size_t i) const { return table[i]; }
 
-        inline Type &operator()(size_t i) { return table[i]; }
-
-        Vector<Type> operator+(Vector<Type> const &v) {
-            if (length != v.length)
+        Vector<T> operator+(Vector<T> const &v) const {
+            if (Matrix<T>::getColumns() != v.Matrix<T>::getColumns() || Matrix<T>::getRows() != v.Matrix<T>::getRows())
                 throw Exception("Size of vectors are different, function Vector::operator+(Vector const &)");
-            Vector<Type> vector(*this);
-            for (size_t i = 0; i < length; ++i)
-                vector.table[i] += v.table[i];
+            Vector<T> vector(*this);
+            for (size_t i = 0; i < Matrix<T>::size(); ++i)
+                (vector.Matrix<T>::elementsPtr())[i] += (v.Matrix<T>::elementsPtr())[i];
             return vector;
         }
 
-        Vector<Type> operator-(Vector<Type> const &v) {
-            if (length != v.length)
+        Vector<T> operator-(Vector<T> const &v) const {
+            if (Matrix<T>::getColumns() != v.Matrix<T>::getColumns() || Matrix<T>::getRows() != v.Matrix<T>::getRows())
                 throw Exception("Size of vectors are different, function Vector::operator-(Vector const &)");
-            Vector<Type> vector(*this);
-            for (size_t i = 0; i < length; ++i)
-                vector.table[i] -= v.table[i];
+            Vector<T> vector(*this);
+            for (size_t i = 0; i < Matrix<T>::size(); ++i)
+                (vector.Matrix<T>::elementsPtr())[i] -= (v.Matrix<T>::elementsPtr())[i];
             return vector;
         }
 
-        Vector<Type> operator*(Type const &v) {
-            Vector<Type> vector(*this);
-            for (size_t i = 0; i < length; ++i)
-                vector.table[i] *= v;
+        Vector<T> operator*(T const &v) const {
+            Vector<T> vector(*this);
+            for (size_t i = 0; i < Matrix<T>::size(); ++i)
+                (vector.Matrix<T>::elementsPtr())[i] *= v;
             return vector;
         }
 
-        Vector<Type> operator/(Type const &v) {
-            Vector<Type> vector(*this);
-            for (size_t i = 0; i < length; ++i)
-                vector.table[i] /= v;
+        Vector<T> operator/(T const &v) const {
+            Vector<T> vector(*this);
+            for (size_t i = 0; i < Matrix<T>::size(); ++i)
+                (vector.Matrix<T>::elementsPtr())[i] /= v;
             return vector;
         }
 
-        Vector<Type> const &operator+=(Vector<Type> const &v) {
-            if (length != v.length)
+
+
+        Vector<T> const &operator+=(Vector<T> const &v) {
+            if (Matrix<T>::getColumns() != v.Matrix<T>::getColumns() || Matrix<T>::getRows() != v.Matrix<T>::getRows())
                 throw Exception("Size of vectors are different, function Vector::operator+=(Vector const &)");
-            for (size_t i = 0; i < length; ++i)
-                table[i] += v.table[i];
+            for (size_t i = 0; i < Matrix<T>::size(); ++i)
+                (Matrix<T>::elementsPtr())[i] += (v.Matrix<T>::elementsPtr())[i];
             return *this;
         }
 
-        Vector<Type> const &operator-=(Vector<Type> const &v) {
-            if (length != v.length)
+        Vector<T> const &operator-=(Vector<T> const &v) {
+            if (Matrix<T>::getColumns() != v.Matrix<T>::getColumns() || Matrix<T>::getRows() != v.Matrix<T>::getRows())
                 throw Exception("Size of vectors are different, function Vector::operator-=(Vector const &)");
-            for (size_t i = 0; i < length; ++i)
-                table[i] -= v.table[i];
+            for (size_t i = 0; i < Matrix<T>::size(); ++i)
+                (Matrix<T>::elementsPtr())[i] -= (v.Matrix<T>::elementsPtr())[i];
             return *this;
         }
 
-        Vector<Type> const &operator*=(Type const &v) {
-            for (size_t i = 0; i < length; ++i)
-                table[i] *= v;
+        Vector<T> const &operator*=(T const &v) {
+            for (size_t i = 0; i < Matrix<T>::size(); ++i)
+                (Matrix<T>::elementsPtr())[i] *= v;
             return *this;
         }
 
-        Vector<Type> const &operator/=(Type const &v) {
-            for (size_t i = 0; i < length; ++i)
-                table[i] /= v;
+        Vector<T> const &operator/=(T const &v) {
+            for (size_t i = 0; i < Matrix<T>::size(); ++i)
+                (Matrix<T>::elementsPtr())[i] /= v;
             return *this;
+        }
+
+
+
+        inline Matrix<T> operator*(Matrix<T> const &m) const {
+            return (static_cast<Matrix<T>>(*this)) * m;
         }
 
     };

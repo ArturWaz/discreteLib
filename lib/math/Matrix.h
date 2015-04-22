@@ -13,7 +13,6 @@
 #include <cstring>
 #include <cstdlib>
 #include <type_traits>
-#include "Vector.h"
 #include "myMath.h"
 
 
@@ -22,8 +21,7 @@ namespace geox {
 
     template<class T>
     class Matrix {
-        static_assert(std::is_arithmetic<T>::value || std::is_same<T, complex>::value,
-                      "\nMatrix<T> template is not supported.\n");
+        static_assert(std::is_arithmetic<T>::value, "\nMatrix<T> template is not supported.\n");
 
         T *elements_;
         size_t rows_;
@@ -40,7 +38,10 @@ namespace geox {
 
     protected:
 
+        inline size_t &rows() { return rows_; }
+        inline size_t &columns() { return columns_; }
         inline T *elementsPtr() { return elements_; }
+
         inline void swapMatrices(Matrix &m) {
             // pointers
             T *tmpElements = m.elements_;
@@ -59,26 +60,20 @@ namespace geox {
     public:
 
         Matrix(size_t rows, size_t columns): rows_(rows), columns_(columns) {
-            elements_ = std::calloc(rows_*columns_, sizeof(T));
+            elements_ = (T*) std::calloc(rows_*columns_, sizeof(T));
             if (elements_ == nullptr) throw Exception("Cannot allocate memory, function: Matrix<T>::Matrix(size_t,size_t)");
         }
         Matrix(Matrix const &m): rows_(m.rows_), columns_(m.columns_) {
             size_t size = rows_*columns_*sizeof(T);
-            elements_ = std::malloc(size);
+            elements_ = (T*) std::malloc(size);
             if (elements_ == nullptr) throw Exception("Cannot allocate memory, function: Matrix<T>::Matrix(Matrix<T> const &)");
             std::memcpy(elements_, m.elements_, size);
         }
-        Matrix(Vector<T> const &v): rows_(v.getRows()), columns_(v.getColumns()) {
-            size_t size = rows_*columns_*sizeof(T);
-            elements_ = std::malloc(size);
-            if (elements_ == nullptr) throw Exception("Cannot allocate memory, function: Matrix<T>::Matrix(Vector<T> const &)");
-            std::memcpy(elements_, v.elements_, size);
-        }
         ~Matrix() { if (elements_ != nullptr) free(elements_); }
 
-        Matrix &operator=(Matrix const &matrix) {
+        Matrix &operator=(Matrix const &m) {
             if (rows_ != m.rows_ || columns_ != m.columns_) throw Exception("Size of matrices are different, function: Matrix<T>::operator=(Matrix<T> const &)");
-            memcpy(elements_, matrix.elements_, rows_*columns_*sizeof(T));
+            memcpy(elements_, m.elements_, rows_*columns_*sizeof(T));
             return *this;
         }
 
@@ -109,7 +104,7 @@ namespace geox {
             Matrix<T> matrix(columns_, rows_);
             for (size_t i = 0; i < rows_; ++i)
                 for (size_t j = 0; j < columns_; ++j)
-                    matrix.table[j][i] = table[i][j];
+                    matrix.elements_(j,i) = elements_(i,j);
             swapMatrices(matrix);
             return *this;
         }
@@ -134,7 +129,7 @@ namespace geox {
             for (size_t i = 0; i < matrix.rows_; ++i)
                 for (size_t j = 0; j < matrix.columns_; ++j)
                     for (size_t k = 0; k < columns_; ++k)
-                        matrix.elements_[i][j] += elements_[i][k] * m.elements_[k][j];
+                        matrix.elements_(i,j) += operator()(i,k) * m(k,j);
             swapMatrices(matrix);
             return *this;
         }
@@ -166,7 +161,7 @@ namespace geox {
             for (size_t i = 0; i < matrix.rows_; ++i)
                 for (size_t j = 0; j < matrix.columns_; ++j)
                     for (size_t k = 0; k < columns_; ++k)
-                        matrix.elements_[i][j] += elements_[i][k] * m.elements_[k][j];
+                        matrix(i,j) += operator()(i,k) * m(k,j);
             return matrix;
         }
 
@@ -178,6 +173,9 @@ namespace geox {
 
     };
 
+
+
+    /*
     template<class Type>
     class Matrix2 {
     protected:
@@ -189,7 +187,7 @@ namespace geox {
 
         Matrix() { }
 
-        void swapMatrices(Matrix<Type> &m) {
+        void swapMatrices(Matrix2<Type> &m) {
             Type *tmp_ptrTable = ptrTable;
             size_t tmp_rows = rows;
             size_t tmp_columns = columns;
@@ -232,14 +230,6 @@ namespace geox {
                 table[i] = &ptrTable[i * columns];
         }
 
-        Matrix2(Vector<Type> const &v) : rows(v.getRows()), columns(v.getColumns()) {
-            ptrTable = (Type *) malloc(v.getLength() * sizeof(Type));
-            table = (Type **) malloc(rows * sizeof(Type *));
-            if (ptrTable == NULL || table == NULL) throw Exception("Cannot allocate memory, function Matrix<T>::Matrix(Vector<T> const &)");
-            for (size_t i = 0; i < rows; ++i)
-                table[i] = &ptrTable[i * columns];
-            memcpy(ptrTable, v.tablePtr(), v.getLength() * sizeof(Type));
-        }
 
         ~Matrix2() {
             free(ptrTable);
@@ -362,6 +352,7 @@ namespace geox {
         }
 
     };
+     */
 
 }
 
