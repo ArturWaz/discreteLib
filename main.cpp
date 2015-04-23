@@ -26,8 +26,8 @@ void print(geox::Matrix<T> const &M) {
 }
 
 void testFunc1() {
-    double nom[] = {0.2642,0.1353}; // http://www.eng.ox.ac.uk/~conmrc/dcs/dcs-lec4.pdf
-    double den[] = {1,-0.7358,0.1353};
+    double nom[] = {0.3679,0.2642}; // http://www.eng.ox.ac.uk/~conmrc/dcs/dcs-lec4.pdf
+    double den[] = {1,-1.3680,0.3679};
     geox::DirectForm_II tf(nom,2,den,3);
 
     geox::Step gen;
