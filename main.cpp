@@ -25,8 +25,8 @@ void print(geox::Matrix<T> const &M) {
     cout << endl;
 }
 
-void testFunc1() {
-    double nom[] = {0.3679,0.2642}; // http://www.eng.ox.ac.uk/~conmrc/dcs/dcs-lec4.pdf
+void testFunc1() { // 1/(s(s+1))
+    double nom[] = {0.3679,0.2642}; 
     double den[] = {1,-1.3680,0.3679};
     geox::DirectForm_II tf(nom,2,den,3);
 
