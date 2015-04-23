@@ -100,13 +100,12 @@ namespace geox {
 
 
 
-        Matrix &transpose() {
+        Matrix transpose() {
             Matrix<T> matrix(columns_, rows_);
             for (size_t i = 0; i < rows_; ++i)
                 for (size_t j = 0; j < columns_; ++j)
                     matrix.elements_(j,i) = elements_(i,j);
-            swapMatrices(matrix);
-            return *this;
+            return matrix;
         }
 
 
